@@ -49,10 +49,52 @@ public class SearchHelper {
 	
 	
 	
-	private Integer getDistance(String word, String reference)
+	private Integer getDistance(String word, String ref)
 	{
-		//TODO: Write code to find distance between two words
-		return 1;
+		//TODO: Optimi[zs]e code to find the Damerau-Levenshtein distance
+		final int wordLength = word.length();
+		final int refLength = ref.length();
+		int mat[][] = new int[wordLength+1][refLength+1];
+		
+		for(int i = 0; i<= wordLength; i++)
+		{
+			mat[i][0] = i;
+		}
+		for(int j = 0; j<= refLength; j++)
+		{
+			mat[0][j] = j;
+		}
+		int cost;
+		
+		for(int j = 1; j <= refLength; j++)
+		{
+			for(int i = 1; i <= wordLength; i++)
+			{
+				cost = word.codePointAt(i)==ref.codePointAt(j) ? 0 : 1;
+				mat[i][j] = minimum(mat[i-1][j],mat[i][j-1],mat[i-1][j-1]) + 1;
+				
+				if(i > 1 && j > 1 &&(word.codePointAt(i) == ref.codePointAt(j-1)) && (word.codePointAt(i-1) == ref.codePointAt(j)))
+				{
+					mat[i][j] = minimum(mat[i][j],mat[i-2][j-2]+cost);
+				}
+			}			
+		}
+		
+		return mat[wordLength][refLength];
+	}
+	
+	private final static int minimum(int... values)
+	{
+		int min = values[0];
+		for(int val : values)
+		{
+			if(min > val)
+			{
+				min = val;
+			}
+		}
+		
+		return min;
 	}
 }
 
