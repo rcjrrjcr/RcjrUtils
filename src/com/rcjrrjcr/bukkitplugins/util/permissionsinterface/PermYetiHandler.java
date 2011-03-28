@@ -26,7 +26,7 @@ public class PermYetiHandler implements IPermHandler {
 	}
 	@Override
 	public boolean hasPerm(String world,String playerName, String perm) {
-		if((origin.active==null)||(!origin.active.isPermActive())) return false;
+		if(origin.active==null||!origin.active.isPermActive()) return false;
 		if(origin.getServer().getPlayer(playerName)==null)return false;
 		return permHandle.has(origin.getServer().getPlayer(playerName), perm);
 	}
@@ -45,7 +45,7 @@ public class PermYetiHandler implements IPermHandler {
 
 	@Override
 	public void addPerm(String world,String playerName, String perm) {
-		if((origin.active==null)||(!origin.active.isPermActive()))
+		if(origin.active==null||!origin.active.isPermActive())
 		{
 			PermissionData pData = new PermissionData();
 			pData.setWorld(world);
@@ -60,7 +60,7 @@ public class PermYetiHandler implements IPermHandler {
 
 	@Override
 	public void removePerm(String world,String playerName, String perm) {
-		if((origin.active==null)||(!origin.active.isPermActive()))
+		if(origin.active==null||!origin.active.isPermActive())
 		{
 			PermissionData pData = new PermissionData();
 			pData.setWorld(world);
@@ -74,7 +74,7 @@ public class PermYetiHandler implements IPermHandler {
 
 	@Override
 	public boolean isInGroup(String world,String playerName, String group) {
-		if((origin.active==null)||(!origin.active.isPermActive())) return false;
+		if(origin.active==null||!origin.active.isPermActive()) return false;
 		return permHandle.inGroup(world, playerName, group);
 	}
 
@@ -91,13 +91,13 @@ public class PermYetiHandler implements IPermHandler {
 
 	@Override
 	public String[] listGroups(String world, String playerName) {
-		if((origin.active==null)||(!origin.active.isPermActive())) return null;
+		if(origin.active==null||!origin.active.isPermActive()) return null;
 		return permHandle.getGroups(world,playerName);
 	}
 	
 	@Override
 	public void flushCache() {
-		if((origin.active==null)||(!origin.active.isPermActive())) return;
+		if(origin.active==null||!origin.active.isPermActive()) return;
 		for(PermissionData pAdd : permAddCache)
 		{
 			addPerm(pAdd.getWorld(),pAdd.getPlayerName(),pAdd.getNode());
