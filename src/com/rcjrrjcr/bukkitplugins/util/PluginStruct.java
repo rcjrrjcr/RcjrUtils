@@ -10,7 +10,7 @@ public class PluginStruct {
 	}
 	public boolean getStatus()
 	{
-		return isPermActive()&isEconActive();
+		return isPermActive()&&isEconActive();
 	}
 	public boolean isPermActive() {
 		return perm;

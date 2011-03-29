@@ -20,6 +20,7 @@ public class SearchHelper {
 
 	private HashSet<String> knownWords;
 //	private static final Pattern splitWords= Pattern.compile("\\b(\\w+)\\b");
+	private final static int[] ZERO_LENGTH_INT_ARRAY = new int[0];
 	public SearchHelper()
 	{
 		knownWords = new HashSet<String>();
@@ -60,8 +61,8 @@ public class SearchHelper {
 		 Map<String,Integer> weightedWords = new HashMap<String,Integer>(knownWords.size());
 		 for(String s : knownWords)
 		 {
-			 int dist = getDistance(word,s);
-			 if(threshold <= 0||!(dist < threshold)) weightedWords.put(s,dist);
+			 int dist = damlev(word,s);
+			 if(threshold > 0||!(dist < threshold)) weightedWords.put(s,dist);
 		 }
 		 LinkedHashMap<String,Integer> sortedWords = sortMapByValue(weightedWords, new Comparator<Integer>()
 		 {
@@ -102,68 +103,59 @@ public class SearchHelper {
 		return results;
 		
 	}
-	/**
-	 * Calculates Damerau-Levenshtein distance
-	 * @param word First word
-	 * @param ref Second word
-	 * @return Damerau-Levenshtein distance
-	 */
-	private Integer getDistance(String word, String ref)
-	{
-		//TODO: Optimi[zs]e code to find the Damerau-Levenshtein distance
-		final int wordLength = word.length();
-		final int refLength = ref.length();
-		int mat[][] = new int[wordLength+1][refLength+1];
-		
-		for(int i = 0; i<= wordLength; i++)
-		{
-			mat[i][0] = i;
-		}
-		for(int j = 0; j<= refLength; j++)
-		{
-			mat[0][j] = j;
-		}
-		int cost;
-		
-		for(int j = 1; j <= refLength; j++)
-		{
-			for(int i = 1; i <= wordLength; i++)
-			{
-				cost = word.codePointAt(i)==ref.codePointAt(j) ? 0 : 1;
-				mat[i][j] = minimum(mat[i-1][j],mat[i][j-1],mat[i-1][j-1]) + 1;
-				
-				if(i > 1 && j > 1 &&(word.codePointAt(i) == ref.codePointAt(j-1)) && (word.codePointAt(i-1) == ref.codePointAt(j)))
-				{
-					mat[i][j] = minimum(mat[i][j],mat[i-2][j-2]+cost);
-				}
-			}			
-		}
-		return mat[wordLength][refLength];
-	}
+//	/**
+//	 * Calculates Damerau-Levenshtein distance
+//	 * @param str1 First word
+//	 * @param str2 Second word
+//	 * @return Damerau-Levenshtein distance
+//	 */
+//	public static Integer getDistance(String str1, String str2)
+//	{
+//		int[][] distance = new int[str1.length() + 1][str2.length() + 1];
+//		 
+//        for (int i = 0; i <= str1.length(); i++)
+//                distance[i][0] = i;
+//        for (int j = 0; j <= str2.length(); j++)
+//                distance[0][j] = j;
+//
+//        for (int i = 1; i <= str1.length(); i++)
+//        {
+//                for (int j = 1; j <= str2.length(); j++)
+//                {
+//                        distance[i][j] = minimum(
+//                                        distance[i - 1][j] + 1,
+//                                        distance[i][j - 1] + 1,
+//                                        distance[i - 1][j - 1]
+//                                                        + ((str1.charAt(i - 1) == str2.charAt(j - 1)) ? 0
+//                                                                        : 1));
+//                }
+//        }
+//        return distance[str1.length()][str2.length()];
+//	}
 	
 	public void clear()
 	{
 		knownWords.clear();
 	}
-	/**
-	 * Utility function to get the minimum of all parameters.
-	 * @param values Integers to compare
-	 * @return Least integer
-	 */
-	private final static int minimum(int... values)
-	{
-		if(values.length==0) return 0;
-		int min = values[0];
-		for(int val : values)
-		{
-			if(min > val)
-			{
-				min = val;
-			}
-		}
-		
-		return min;
-	}
+//	/**
+//	 * Utility function to get the minimum of all parameters.
+//	 * @param values Integers to compare
+//	 * @return Least integer
+//	 */
+//	private final static int minimum(int... values)
+//	{
+//		if(values.length==0) return 0;
+//		int min = values[0];
+//		for(int val : values)
+//		{
+//			if(min > val)
+//			{
+//				min = val;
+//			}
+//		}
+//		
+//		return min;
+//	}
 	
 	
 //	private final static <E extends Comparable<E>> E minimum( E... values)
@@ -207,6 +199,183 @@ public class SearchHelper {
 		}
 		return sortedMap;
 	}
+	
+
+	//COPYCODE START: This code was copied from	http://blog.lolyco.com/sean/damerau-levenshtein/. I do not take credit for this code.
+	public static int damlev(String s, String t)
+	{
+		if (s != null && t != null)
+			return damlev(s, t, getWorkspace(s.length(), t.length()));
+		else
+			return damlev(s, t, ZERO_LENGTH_INT_ARRAY);
+	}
+	public static int damlevlim(String s, String t, int limit)
+	{
+		if (s != null && t != null)
+			return damlevlim(s, t, limit, getWorkspace(s.length(), t.length()));
+		else
+			return damlevlim(s, t, limit, ZERO_LENGTH_INT_ARRAY);
+	}
+	public static int[] getWorkspace(int sl, int tl)
+	{
+		return new int[(sl + 1) * (tl + 1)];
+	}
+	private static int damlev(String s, String t, int[] workspace)
+	{
+		int lenS = s.length();
+		int lenT = t.length();
+		int lenS1 = lenS + 1;
+		int lenT1 = lenT + 1;
+		if (lenT1 == 1)
+			return lenS1 - 1;
+		if (lenS1 == 1)
+			return lenT1 - 1;
+		int[] dl = workspace;
+		int dlIndex = 0;
+		int sPrevIndex = 0, tPrevIndex = 0, rowBefore = 0, min = 0, cost = 0, tmp = 0;
+		int tri = lenS1 + 2;
+		// start row with constant
+		dlIndex = 0;
+		for (tmp = 0; tmp < lenT1; tmp++)
+		{
+			dl[dlIndex] = tmp;
+			dlIndex += lenS1;
+		}
+		for (int sIndex = 0; sIndex < lenS; sIndex++)
+		{
+			dlIndex = sIndex + 1;
+			dl[dlIndex] = dlIndex; // start column with constant
+			for (int tIndex = 0; tIndex < lenT; tIndex++)
+			{
+				rowBefore = dlIndex;
+				dlIndex += lenS1;
+				//deletion
+				min = dl[rowBefore] + 1;
+				// insertion
+				tmp = dl[dlIndex - 1] + 1;
+				if (tmp < min)
+					min = tmp;
+				cost = 1;
+				if (s.charAt(sIndex) == t.charAt(tIndex))
+					cost = 0;
+				if (sIndex > 0 && tIndex > 0)
+				{
+					if (s.charAt(sIndex) == t.charAt(tPrevIndex) && s.charAt(sPrevIndex) == t.charAt(tIndex))
+					{
+						tmp = dl[rowBefore - tri] + cost;
+						// transposition
+						if (tmp < min)
+							min = tmp;
+					}
+				}
+				// substitution
+				tmp = dl[rowBefore - 1] + cost;
+				if (tmp < min)
+					min = tmp;
+				dl[dlIndex] = min;
+				/* * /
+				System.out.println("sPrevIndex=" + sPrevIndex + ", tPrevIndex=" + tPrevIndex + ", sIndex=" + sIndex + ", tIndex=" + tIndex);
+				System.out.println("'" + s + "', '" + t + "'");
+				for (int v = 0; v < lenT1; v++)
+				{
+					for (int w = 0; w < lenS1; w++)
+						System.out.print(dl[v * lenS1 + w] + " ");
+					System.out.println();
+				}
+				/**/
+				tPrevIndex = tIndex;
+			}
+			sPrevIndex = sIndex;
+		}
+		return dl[dlIndex];
+	}
+	private static int damlevlim(String s, String t, int limit, int[] workspace)
+	{
+		int lenS = s.length();
+		int lenT = t.length();
+		if (lenS < lenT)
+		{
+			if (lenT - lenS >= limit)
+				return limit;
+		}
+		else
+			if (lenT < lenS)
+				if (lenS - lenT >= limit)
+					return limit;
+		int lenS1 = lenS + 1;
+		int lenT1 = lenT + 1;
+		if (lenS1 == 1)
+			return (lenT < limit)?lenT:limit;
+		if (lenT1 == 1)
+			return (lenS < limit)?lenS:limit;
+		int[] dl = workspace;
+		int dlIndex = 0;
+		int sPrevIndex = 0, tPrevIndex = 0, rowBefore = 0, min = 0, tmp = 0, best = 0, cost = 0;
+		int tri = lenS1 + 2;
+		// start row with constant
+		dlIndex = 0;
+		for (tmp = 0; tmp < lenT1; tmp++)
+		{
+			dl[dlIndex] = tmp;
+			dlIndex += lenS1;
+		}
+		for (int sIndex = 0; sIndex < lenS; sIndex++)
+		{
+			dlIndex = sIndex + 1;
+			dl[dlIndex] = dlIndex; // start column with constant
+			best = limit;
+			for (int tIndex = 0; tIndex < lenT; tIndex++)
+			{
+				rowBefore = dlIndex;
+				dlIndex += lenS1;
+				//deletion
+				min = dl[rowBefore] + 1;
+				// insertion
+				tmp = dl[dlIndex - 1] + 1;
+				if (tmp < min)
+					min = tmp;
+				cost = 1;
+				if (s.charAt(sIndex) == t.charAt(tIndex))
+					cost = 0;
+				if (sIndex > 0 && tIndex > 0)
+				{
+					if (s.charAt(sIndex) == t.charAt(tPrevIndex) && s.charAt(sPrevIndex) == t.charAt(tIndex))
+					{
+						tmp = dl[rowBefore - tri] + cost;
+						// transposition
+						if (tmp < min)
+							min = tmp;
+					}
+				}
+				// substitution
+				tmp = dl[rowBefore - 1] + cost;
+				if (tmp < min)
+					min = tmp;
+				dl[dlIndex] = min;
+				if (min < best)
+					best = min;
+				/** /
+				System.out.println("sPrevIndex=" + sPrevIndex + ", tPrevIndex=" + tPrevIndex + ", sIndex=" + sIndex + ", tIndex=" + tIndex);
+				System.out.println("'" + s + "', '" + t + "'");
+				for (int v = 0; v < lenT1; v++)
+				{
+					for (int w = 0; w < lenS1; w++)
+						System.out.print(dl[v * lenS1 + w] + " ");
+					System.out.println();
+				}
+				/**/
+				tPrevIndex = tIndex;
+			}
+			if (best >= limit)
+				return limit;
+			sPrevIndex = sIndex;
+		}
+		if (dl[dlIndex] >= limit)
+			return limit;
+		else
+			return dl[dlIndex];
+	}
+	//COPYCODE END
 }
 
 

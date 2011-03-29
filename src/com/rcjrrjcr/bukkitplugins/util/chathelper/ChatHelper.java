@@ -27,6 +27,7 @@ public class ChatHelper {
 		ArrayList<String> wrappedMsg = wrapLines(msg,color);
 		for(String s : wrappedMsg)
 		{
+//			System.out.println(s);
 			player.sendMessage(s);
 		}
 		return wrappedMsg.size();
@@ -92,16 +93,19 @@ public class ChatHelper {
 	{
 		if(color == null)
 		{
+//			System.out.println("No chat color");
 			return wrapText(msg,lineLength);
 		}
 		else
 		{
-			ArrayList<String> splitMsg =  wrapText(msg, (lineLength - color.toString().length()) );
-			for(String line : splitMsg)
+//			System.out.println("Chat color used:"+color);
+			ArrayList<String> uncoloured =  wrapText(msg, (lineLength - color.toString().length()) );
+			ArrayList<String> coloured = new ArrayList<String>(uncoloured.size());
+			for(String line : uncoloured)
 			{
-				line = color.toString() + line;
+				coloured.add(color + line);
 			}
-			return splitMsg;
+			return coloured;
 		}
 	}
 	
