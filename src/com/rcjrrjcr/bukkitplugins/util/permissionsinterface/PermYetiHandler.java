@@ -54,7 +54,7 @@ public class PermYetiHandler implements IPermHandler {
 			permAddCache.add(pData);
 			return;
 		}
-		permHandle.addUserPermission("world",playerName,perm);
+		permHandle.setCacheItem(world, playerName, perm, true);
 		return;
 	}
 
@@ -69,7 +69,7 @@ public class PermYetiHandler implements IPermHandler {
 			permRemCache.add(pData);
 			return;
 		}
-		permHandle.removeUserPermission(world,playerName, perm);
+		permHandle.setCacheItem(world, playerName, perm, false);
 	}
 
 	@Override
