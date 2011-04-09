@@ -1,15 +1,15 @@
 package com.rcjrrjcr.bukkitplugins.util.economyinterface;
 
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
 
 import com.earth2me.essentials.User;
+import com.rcjrrjcr.bukkitplugins.util.RcjrPlugin;
 
 public class EconEssentials implements IEconHandler {
 
-	private Plugin origin;
+	private RcjrPlugin origin;
 	
-	public EconEssentials(Plugin origin) {
+	public EconEssentials(RcjrPlugin origin) {
 		this.origin = origin;
 	}
 

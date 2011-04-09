@@ -4,5 +4,6 @@ public enum EconPlugin
 {
 	IC4,
 	ESSECO,
+	BOS,
 	NONE
 }

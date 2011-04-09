@@ -2,10 +2,12 @@ package com.rcjrrjcr.bukkitplugins.util.economyinterface;
 
 import org.bukkit.plugin.Plugin;
 
+import com.rcjrrjcr.bukkitplugins.util.RcjrPlugin;
+
 
 public final class EconFactory
 {
-	public static IEconHandler getInstance(EconPlugin pluginType,Plugin plugin,Plugin origin) throws Exception
+	public static IEconHandler getInstance(EconPlugin pluginType,Plugin plugin,RcjrPlugin origin) throws Exception
 	{
 		if (pluginType == EconPlugin.IC4)
 		{
@@ -14,6 +16,10 @@ public final class EconFactory
 		else if (pluginType == EconPlugin.ESSECO)
 		{
 			return new EconEssentials(origin);
+		}
+		else if (pluginType == EconPlugin.BOS)
+		{
+			return new EconBos(plugin);
 		}
 		else if (pluginType == EconPlugin.NONE)
 		{

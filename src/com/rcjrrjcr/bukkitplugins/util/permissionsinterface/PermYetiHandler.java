@@ -4,16 +4,16 @@ import java.util.LinkedHashSet;
 
 import org.bukkit.plugin.Plugin;
 
-import com.nijiko.permissions.Control;
+//import com.nijiko.permissions.Control;
+import com.nijiko.permissions.PermissionHandler;
 import com.nijikokun.bukkit.Permissions.Permissions;
 import com.rcjrrjcr.bukkitplugins.util.RcjrPlugin;
 
 
-//TODO: Find way to add permissions dynamically.
 public class PermYetiHandler implements IPermHandler {
 	private Permissions plugin;
 	private RcjrPlugin origin;
-	private Control permHandle;
+	private PermissionHandler permHandle;
 	private LinkedHashSet<PermissionData> permAddCache;
 	private LinkedHashSet<PermissionData> permRemCache;
 	
@@ -26,8 +26,18 @@ public class PermYetiHandler implements IPermHandler {
 	}
 	@Override
 	public boolean hasPerm(String world,String playerName, String perm) {
-		if(origin.active==null||!(origin.active.isPermActive())) return false;
-		if(origin.getServer().getPlayer(playerName)==null)return false;
+		if(origin.active==null||!(origin.active.isPermActive()))
+		{
+//			System.out.println(origin.active==null);
+//			System.out.println(!(origin.active.isPermActive()));
+			System.out.println("Permissions plugin inactive!");
+			return false;
+		}
+		if(origin.getServer().getPlayer(playerName)==null)
+		{
+//			System.out.println("Player not online!");
+			return false;
+		}
 		return permHandle.has(origin.getServer().getPlayer(playerName), perm);
 	}
 
@@ -54,7 +64,8 @@ public class PermYetiHandler implements IPermHandler {
 			permAddCache.add(pData);
 			return;
 		}
-		permHandle.setCacheItem(world, playerName, perm, true);
+		permHandle.addUserPermission(world, playerName.toLowerCase(), perm);
+		permHandle.setCacheItem(world, playerName.toLowerCase(), perm, true);
 		return;
 	}
 
@@ -69,7 +80,8 @@ public class PermYetiHandler implements IPermHandler {
 			permRemCache.add(pData);
 			return;
 		}
-		permHandle.setCacheItem(world, playerName, perm, false);
+		permHandle.removeUserPermission(world, playerName.toLowerCase(), perm);
+		permHandle.setCacheItem(world, playerName.toLowerCase(), perm, false);
 	}
 
 	@Override
@@ -84,7 +96,7 @@ public class PermYetiHandler implements IPermHandler {
 		if(plugin instanceof Permissions)
 		{
 			this.plugin=(Permissions) plugin;
-			this.permHandle = (Control) this.plugin.getHandler();
+			this.permHandle = this.plugin.getHandler();
 		}
 		return;		
 	}

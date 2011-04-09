@@ -1,14 +1,14 @@
 package com.rcjrrjcr.bukkitplugins.util.economyinterface;
 
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
 
 import com.nijiko.coelho.iConomy.iConomy;
+import com.rcjrrjcr.bukkitplugins.util.RcjrPlugin;
 
 public class EconIC4Handler implements IEconHandler {
 	
 	//private BuyAbilities origin;
-	public EconIC4Handler(Plugin origin) {
+	public EconIC4Handler(RcjrPlugin origin) {
 	//	this.origin = origin;
 	}
 
